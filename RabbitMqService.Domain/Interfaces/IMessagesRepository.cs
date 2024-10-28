@@ -4,6 +4,7 @@ namespace RabbitMqService.DataAccess.Repositories
 {
     public interface IMessagesRepository
     {
-        Task<long> Create(Model.Message message);
+        Task<long> CreateAsync(Model.Message message);
+        Task<long> UpdateStatusToTransferred(long messageId);
     }
 }

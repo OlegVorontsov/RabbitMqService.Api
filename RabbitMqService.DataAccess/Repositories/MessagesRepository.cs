@@ -1,5 +1,6 @@
 ﻿using RabbitMqService.DataAccess.Entities;
 using static RabbitMqService.Domain.Models.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace RabbitMqService.DataAccess.Repositories
 {
@@ -10,7 +11,7 @@ namespace RabbitMqService.DataAccess.Repositories
         {
             _context = context;
         }
-        public async Task<long> Create(Message message)
+        public async Task<long> CreateAsync(Message message)
         {
             var messageEntity = new MessageEntity
             {
@@ -20,13 +21,22 @@ namespace RabbitMqService.DataAccess.Repositories
                 Details = message.Details,
                 BankingDate = message.BankingDate,
                 Attributes = message.Attributes,
-                RequestDateTime = DateTime.Now
+                RequestDateTime = DateTime.Now,
+                Status = ProcessingStatus.Received
             };
 
             await _context.Messages.AddAsync(messageEntity);
             await _context.SaveChangesAsync();
 
             return messageEntity.Request.Id;
+        }
+        public async Task<long> UpdateStatusToTransferred(long messageId)
+        {
+            await _context.Messages
+                .Where(m => m.Request.Id == messageId)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(m => m.Status, ProcessingStatus.Transferred));
+            return messageId;
         }
     }
 }

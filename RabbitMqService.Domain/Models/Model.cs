@@ -3,6 +3,16 @@ namespace RabbitMqService.Domain.Models
 {
     public class Model
     {
+        // BusinessObject
+        public class Message
+        {
+            public Request Request { get; set; }
+            public DebitPart DebitPart { get; set; }
+            public CreditPart CreditPart { get; set; }
+            public string Details { get; set; }
+            public string BankingDate { get; set; }
+            public List<Attribute> Attributes { get; set; }
+        }
         public class Request
         {
             public long Id { get; set; }
@@ -21,7 +31,7 @@ namespace RabbitMqService.Domain.Models
             public string AccountNumber { get; set; }
             public decimal Amount { get; set; }
             public string Currency { get; set; }
-            public Dictionary<string, string> Attributes { get; set; }
+            public List<Attribute> Attributes { get; set; }
         }
 
         public class CreditPart
@@ -30,23 +40,13 @@ namespace RabbitMqService.Domain.Models
             public string AccountNumber { get; set; }
             public decimal Amount { get; set; }
             public string Currency { get; set; }
-            public Dictionary<string, string> Attributes { get; set; }
-        }
-
-        public class Message
-        {
-            public Request Request { get; set; }
-            public DebitPart DebitPart { get; set; }
-            public CreditPart CreditPart { get; set; }
-            public string Details { get; set; }
-            public string BankingDate { get; set; }
-            public Dictionary<string, List<Attribute>> Attributes { get; set; }
+            public List<Attribute> Attributes { get; set; }
         }
 
         public class Attribute
         {
-            public string Code { get; set; }
-            public string Value { get; set; }
+            public string Code { get; set; } = string.Empty;
+            public string Value { get; set; } = string.Empty;
         }
     }
 }
