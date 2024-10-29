@@ -12,7 +12,7 @@ using RabbitMqService.DataAccess;
 namespace RabbitMqService.DataAccess.Migrations
 {
     [DbContext(typeof(MessageDbContext))]
-    [Migration("20241028143801_Init")]
+    [Migration("20241029102759_Init")]
     partial class Init
     {
         /// <inheritdoc />

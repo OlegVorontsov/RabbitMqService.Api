@@ -11,7 +11,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<MessageDbContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString(nameof(MessageDbContext)));
+    string connectionString = "Server=RabbitMqService;Host=localhost;Port=5432;Database=MessagesDb;User ID=postgres;Password=123;Timeout=300;CommandTimeout=300;Pooling=true";
+    options.UseNpgsql(connectionString);
 });
 
 builder.Services.AddScoped<IMessageService, MessageService>();
