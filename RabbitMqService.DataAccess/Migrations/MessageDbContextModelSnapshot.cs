@@ -22,7 +22,7 @@ namespace RabbitMqService.DataAccess.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("RabbitMqService.DataAccess.Entities.AttributeEntity", b =>
+            modelBuilder.Entity("RabbitMqService.DataAccess.Entities.CreditPartAttributeEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -32,13 +32,7 @@ namespace RabbitMqService.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("CreditPartEntityId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("DebitPartEntityId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("MessageEntityId")
+                    b.Property<Guid>("CreditPartId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Value")
@@ -47,13 +41,9 @@ namespace RabbitMqService.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreditPartEntityId");
+                    b.HasIndex("CreditPartId");
 
-                    b.HasIndex("DebitPartEntityId");
-
-                    b.HasIndex("MessageEntityId");
-
-                    b.ToTable("AttributeEntity");
+                    b.ToTable("CreditPartAttributes");
                 });
 
             modelBuilder.Entity("RabbitMqService.DataAccess.Entities.CreditPartEntity", b =>
@@ -77,9 +67,39 @@ namespace RabbitMqService.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("MessageId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
-                    b.ToTable("CreditPartEntity");
+                    b.HasIndex("MessageId")
+                        .IsUnique();
+
+                    b.ToTable("CreditParts");
+                });
+
+            modelBuilder.Entity("RabbitMqService.DataAccess.Entities.DebitPartAttributeEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("DebitPartId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DebitPartId");
+
+                    b.ToTable("DebitPartAttributes");
                 });
 
             modelBuilder.Entity("RabbitMqService.DataAccess.Entities.DebitPartEntity", b =>
@@ -103,9 +123,15 @@ namespace RabbitMqService.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("MessageId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
-                    b.ToTable("DebitPartEntity");
+                    b.HasIndex("MessageId")
+                        .IsUnique();
+
+                    b.ToTable("DebitParts");
                 });
 
             modelBuilder.Entity("RabbitMqService.DataAccess.Entities.DocumentEntity", b =>
@@ -116,13 +142,43 @@ namespace RabbitMqService.DataAccess.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<long>("RequestId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.ToTable("DocumentEntity");
+                    b.HasIndex("RequestId")
+                        .IsUnique();
+
+                    b.ToTable("Documents");
+                });
+
+            modelBuilder.Entity("RabbitMqService.DataAccess.Entities.MessageAttributeEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("MessageId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MessageId");
+
+                    b.ToTable("MessageAttributes");
                 });
 
             modelBuilder.Entity("RabbitMqService.DataAccess.Entities.MessageEntity", b =>
@@ -135,12 +191,6 @@ namespace RabbitMqService.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("CreditPartId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("DebitPartId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Details")
                         .IsRequired()
                         .HasColumnType("text");
@@ -148,19 +198,10 @@ namespace RabbitMqService.DataAccess.Migrations
                     b.Property<DateTime>("RequestDateTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<long>("RequestId")
-                        .HasColumnType("bigint");
-
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CreditPartId");
-
-                    b.HasIndex("DebitPartId");
-
-                    b.HasIndex("RequestId");
 
                     b.ToTable("Messages");
                 });
@@ -173,67 +214,92 @@ namespace RabbitMqService.DataAccess.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<long>("DocumentId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("MessageId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DocumentId");
+                    b.HasIndex("MessageId")
+                        .IsUnique();
 
-                    b.ToTable("RequestEntity");
+                    b.ToTable("Requests");
                 });
 
-            modelBuilder.Entity("RabbitMqService.DataAccess.Entities.AttributeEntity", b =>
-                {
-                    b.HasOne("RabbitMqService.DataAccess.Entities.CreditPartEntity", null)
-                        .WithMany("Attributes")
-                        .HasForeignKey("CreditPartEntityId");
-
-                    b.HasOne("RabbitMqService.DataAccess.Entities.DebitPartEntity", null)
-                        .WithMany("Attributes")
-                        .HasForeignKey("DebitPartEntityId");
-
-                    b.HasOne("RabbitMqService.DataAccess.Entities.MessageEntity", null)
-                        .WithMany("Attributes")
-                        .HasForeignKey("MessageEntityId");
-                });
-
-            modelBuilder.Entity("RabbitMqService.DataAccess.Entities.MessageEntity", b =>
+            modelBuilder.Entity("RabbitMqService.DataAccess.Entities.CreditPartAttributeEntity", b =>
                 {
                     b.HasOne("RabbitMqService.DataAccess.Entities.CreditPartEntity", "CreditPart")
-                        .WithMany()
+                        .WithMany("Attributes")
                         .HasForeignKey("CreditPartId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("CreditPart");
+                });
+
+            modelBuilder.Entity("RabbitMqService.DataAccess.Entities.CreditPartEntity", b =>
+                {
+                    b.HasOne("RabbitMqService.DataAccess.Entities.MessageEntity", "Message")
+                        .WithOne("CreditPart")
+                        .HasForeignKey("RabbitMqService.DataAccess.Entities.CreditPartEntity", "MessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Message");
+                });
+
+            modelBuilder.Entity("RabbitMqService.DataAccess.Entities.DebitPartAttributeEntity", b =>
+                {
                     b.HasOne("RabbitMqService.DataAccess.Entities.DebitPartEntity", "DebitPart")
-                        .WithMany()
+                        .WithMany("Attributes")
                         .HasForeignKey("DebitPartId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RabbitMqService.DataAccess.Entities.RequestEntity", "Request")
-                        .WithMany()
-                        .HasForeignKey("RequestId")
+                    b.Navigation("DebitPart");
+                });
+
+            modelBuilder.Entity("RabbitMqService.DataAccess.Entities.DebitPartEntity", b =>
+                {
+                    b.HasOne("RabbitMqService.DataAccess.Entities.MessageEntity", "Message")
+                        .WithOne("DebitPart")
+                        .HasForeignKey("RabbitMqService.DataAccess.Entities.DebitPartEntity", "MessageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CreditPart");
+                    b.Navigation("Message");
+                });
 
-                    b.Navigation("DebitPart");
+            modelBuilder.Entity("RabbitMqService.DataAccess.Entities.DocumentEntity", b =>
+                {
+                    b.HasOne("RabbitMqService.DataAccess.Entities.RequestEntity", "Request")
+                        .WithOne("Document")
+                        .HasForeignKey("RabbitMqService.DataAccess.Entities.DocumentEntity", "RequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Request");
                 });
 
-            modelBuilder.Entity("RabbitMqService.DataAccess.Entities.RequestEntity", b =>
+            modelBuilder.Entity("RabbitMqService.DataAccess.Entities.MessageAttributeEntity", b =>
                 {
-                    b.HasOne("RabbitMqService.DataAccess.Entities.DocumentEntity", "Document")
-                        .WithMany()
-                        .HasForeignKey("DocumentId")
+                    b.HasOne("RabbitMqService.DataAccess.Entities.MessageEntity", "Message")
+                        .WithMany("Attributes")
+                        .HasForeignKey("MessageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Document");
+                    b.Navigation("Message");
+                });
+
+            modelBuilder.Entity("RabbitMqService.DataAccess.Entities.RequestEntity", b =>
+                {
+                    b.HasOne("RabbitMqService.DataAccess.Entities.MessageEntity", "Message")
+                        .WithOne("Request")
+                        .HasForeignKey("RabbitMqService.DataAccess.Entities.RequestEntity", "MessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Message");
                 });
 
             modelBuilder.Entity("RabbitMqService.DataAccess.Entities.CreditPartEntity", b =>
@@ -249,6 +315,21 @@ namespace RabbitMqService.DataAccess.Migrations
             modelBuilder.Entity("RabbitMqService.DataAccess.Entities.MessageEntity", b =>
                 {
                     b.Navigation("Attributes");
+
+                    b.Navigation("CreditPart")
+                        .IsRequired();
+
+                    b.Navigation("DebitPart")
+                        .IsRequired();
+
+                    b.Navigation("Request")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RabbitMqService.DataAccess.Entities.RequestEntity", b =>
+                {
+                    b.Navigation("Document")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

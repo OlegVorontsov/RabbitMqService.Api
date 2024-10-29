@@ -1,6 +1,8 @@
 ﻿using RabbitMqService.DataAccess.Entities;
 using static RabbitMqService.Domain.Models.Model;
 using Microsoft.EntityFrameworkCore;
+using System;
+using RabbitMqService.Domain.Models;
 
 namespace RabbitMqService.DataAccess.Repositories
 {
@@ -32,7 +34,7 @@ namespace RabbitMqService.DataAccess.Repositories
                     AccountNumber = message.DebitPart.AccountNumber,
                     Amount = message.DebitPart.Amount,
                     Currency = message.DebitPart.Currency,
-                    Attributes = ConvertAttributes(message.DebitPart.Attributes)
+                    Attributes = message.DebitPart.Attributes.Select(a => a.ConvertToDebitPartAttributes()).ToList()
                 },
                 CreditPart = new CreditPartEntity
                 {
@@ -41,11 +43,11 @@ namespace RabbitMqService.DataAccess.Repositories
                     AccountNumber = message.CreditPart.AccountNumber,
                     Amount = message.CreditPart.Amount,
                     Currency = message.CreditPart.Currency,
-                    Attributes = ConvertAttributes(message.CreditPart.Attributes)
+                    Attributes = message.CreditPart.Attributes.Select(a => a.ConvertToCreditPartAttributes()).ToList()
                 },
                 Details = message.Details,
                 BankingDate = message.BankingDate,
-                Attributes = ConvertAttributes(message.Attributes)
+                Attributes = message.Attributes.Select(a => a.ConvertToMessageAttributes()).ToList()
             };
 
             messageEntity.RequestDateTime = DateTime.Now;
@@ -56,21 +58,7 @@ namespace RabbitMqService.DataAccess.Repositories
 
             return messageEntity.Request.Id;
         }
-        private static List<AttributeEntity> ConvertAttributes(dynamic attributes)
-        {
-            var result = new List<AttributeEntity>();
-            foreach (var attribute in attributes)
-            {
-                var newAttribute = new AttributeEntity
-                {
-                    Id = Guid.NewGuid(),
-                    Code = attribute.Code,
-                    Value = attribute.Value
-                };
-                result.Add(newAttribute);
-            }
-            return result;
-        }
+
         public async Task<long> UpdateStatusToTransferred(long messageId)
         {
             await _context.Messages

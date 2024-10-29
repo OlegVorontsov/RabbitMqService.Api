@@ -16,8 +16,8 @@ namespace RabbitMqService.Application.Services
         public async Task<long> ProcessMessage(Message newMessage)
         {
             await AddMessageToDb(newMessage);
-            var xml = ConvertToXml(newMessage);
-            await SendToApi(xml);
+            //var xml = ConvertToXml(newMessage);
+            //await SendToApi(xml);
             return await UpdateStatusToTransferred(newMessage.Request.Id);
         }
 
